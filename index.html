@@ -3,20 +3,26 @@
     <title>chaat</title>
 </head>
 <body>
+    guid: <input type="text" class="guid" value="f30251f6-a04a-4034-9650-5112bb7b3f71"><button onclick="join()">Join</button>
     <div readonly class="txt" style="width: 1000px; height: 400px; border: solid black 2px"></div><br>
-    <input type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">Send</button>
+    <input class="inp" type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">Send</button>
     <script>
+        function join() {
+             GUID = document.querySelector('.guid').value;
+            socket.addEventListener('open', function(event) {
+            // Connection opened, send client GUID to autenticate with wsninja server.
+                socket.send(JSON.stringify({ guid: guid }));
+            });
+        }
+        var GUID;
         var txt = document.querySelector('.txt');
-        var inp = document.querySelector('input');
+        var inp = document.querySelector('.inp');
         var mnick;
         getUserIP(ip=>{mnick = ip});
         // Create WebSocket connection.
         var socket = new WebSocket("wss://node2.wsninja.io");
 
-        socket.addEventListener('open', function(event) {
-        // Connection opened, send client GUID to autenticate with wsninja server.
-            socket.send(JSON.stringify({ guid: "f30251f6-a04a-4034-9650-5112bb7b3f71" }));
-        });
+        
 
         
         
