@@ -3,10 +3,10 @@
     <title>chaat</title>
 </head>
 <body>
-    <textarea readonly style="width: 1000px; height: 400px; resize: none;"></textarea><br>
+    <div readonly class="txt" style="width: 1000px; height: 400px; border: solid black 2px"></div><br>
     <input type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">send</button>
     <script>
-        var txt = document.querySelector('textarea');
+        var txt = document.querySelector('.txt');
         var inp = document.querySelector('input');
         var mnick;
         getUserIP(ip=>{mnick = ip});
@@ -63,7 +63,7 @@
         if(inp.value=='') {
             return;
         }
-        if(inp.value == ':grabagra') {
+        if(inp.value == ':adamhuj') {
             socket.send(JSON.stringify({upd: true, txt: ''}));
             inp.value = '';
             txt.innerHTML = '';
