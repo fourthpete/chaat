@@ -4,7 +4,7 @@
 </head>
 <body>
     <div readonly class="txt" style="width: 1000px; height: 400px; border: solid black 2px"></div><br>
-    <input type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">send</button>
+    <input type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">Send</button>
     <script>
         var txt = document.querySelector('.txt');
         var inp = document.querySelector('input');
@@ -70,7 +70,7 @@
             return
         }
         socket.send(JSON.stringify({msg: true, uname: mnick, text: inp.value}));
-        txt.innerHTML += '\n' + mnick + ': ' + inp.value;
+        txt.innerHTML += '<br>' + mnick + ': ' + inp.value;
         inp.value = '';
     }
     // Listen for websocket messages.
@@ -80,14 +80,14 @@
             socket.send(JSON.stringify({request: true, uname: mnick}));
         } else {
             if(message.request) {
-                txt.innerHTML += '\n' + message.uname + ' joined';
+                txt.innerHTML += '<br>' + message.uname + ' joined';
                 socket.send(JSON.stringify({upd: true, txt: txt.value}));
             }
             if(message.upd) {
                 txt.innerHTML = message.txt;
             }
             if(message.msg) {
-                txt.innerHTML += '\n' + message.uname + ': ' + message.text;
+                txt.innerHTML += '<br>' + message.uname + ': ' + message.text;
             }
         }
     });
