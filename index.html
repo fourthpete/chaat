@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>chaat</title>
+</head>
+<body>
+    <textarea readonly style="width: 1000px; height: 400px; resize: none;"></textarea><br>
+    <input type="text" style="width: 800px;"><button style="width: 200px;" onclick="send()">send</button>
+    <script>
+        var txt = document.querySelector('textarea');
+        var inp = document.querySelector('input');
+        var mnick;
+        getUserIP(ip=>{mnick = ip});
+        // Create WebSocket connection.
+        var socket = new WebSocket("wss://node2.wsninja.io");
+
+        socket.addEventListener('open', function(event) {
+        // Connection opened, send client GUID to autenticate with wsninja server.
+            socket.send(JSON.stringify({ guid: "f30251f6-a04a-4034-9650-5112bb7b3f71" }));
+        });
+
+        
+        
+        
+    function getUserIP(onNewIP) { //  onNewIp - your listener function for new IPs
+        //compatibility for firefox and chrome
+        var myPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+        var pc = new myPeerConnection({
+            iceServers: []
+        }),
+        noop = function() {},
+        localIPs = {},
+        ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
+        key;
+
+        function iterateIP(ip) {
+            if (!localIPs[ip]) onNewIP(ip);
+            localIPs[ip] = true;
+        }
+
+         //create a bogus data channel
+        pc.createDataChannel("");
+
+        // create offer and set local description
+        pc.createOffer().then(function(sdp) {
+            sdp.sdp.split('\n').forEach(function(line) {
+                if (line.indexOf('candidate') < 0) return;
+                line.match(ipRegex).forEach(iterateIP);
+            });
+
+            pc.setLocalDescription(sdp, noop, noop);
+        }).catch(function(reason) {
+            // An error occurred, so handle the failure to connect
+        });
+
+        //listen for candidate events
+        pc.onicecandidate = function(ice) {
+            if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
+            ice.candidate.candidate.match(ipRegex).forEach(iterateIP);
+        };
+    }
+    
+    function send() {
+        socket.send(JSON.stringify({msg: true, uname: mnick, text: inp.value}));
+        txt.innerHTML += '\n' + mnick + ': ' + inp.value;
+        inp.value = '';
+    }
+    // Listen for websocket messages.
+    socket.addEventListener('message', function(event) {
+        var message = JSON.parse(event.data);
+        if (message.accepted === true) {
+            socket.send(JSON.stringify({request: true, uname: mnick}));
+        } else {
+            if(message.request) {
+                txt.innerHTML += '\n' + message.uname + ' joined';
+                socket.send(JSON.stringify({upd: true, txt: txt.value}));
+            }
+            if(message.upd) {
+                txt.innerHTML = message.txt;
+            }
+            if(message.msg) {
+                txt.innerHTML += '\n' + message.uname + ': ' + message.text;
+            }
+        }
+    });
+        
+    </script>
+</body>
+</html>
