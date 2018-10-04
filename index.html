@@ -81,7 +81,7 @@
         } else {
             if(message.request) {
                 txt.innerHTML += '<br>' + message.uname + ' joined';
-                socket.send(JSON.stringify({upd: true, txt: txt.value}));
+                socket.send(JSON.stringify({upd: true, txt: txt.innerHTML}));
             }
             if(message.upd) {
                 txt.innerHTML = message.txt;
